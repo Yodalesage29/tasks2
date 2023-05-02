@@ -78,8 +78,25 @@ app.post("/api/todos", function (req, res) {
   );
 });
 
-// app.put("/api/todos", function (req, res) {});
-app.patch("/api/todos", function (req, res) { });
+// PUT /api/todos/:id
+app.put('/api/todos/:id', function(req, res) {
+  // FIND TASK
+  Todo.findById(req.params.id, function(err, todo) {
+    if (err)
+      res.send(err);
+
+    // Properties
+    todo.text = req.body.text;
+    todo.done = req.body.done;
+
+    // Save
+    todo.save(function(err) {
+      if (err)
+        res.send(err);
+      res.json(todo);
+    });
+  });
+});
 
 // delete a todo
 app.delete("/api/todos/:todo_id", function (req, res) {

@@ -1,6 +1,6 @@
 var nodeTodo = angular.module("nodeTodo", []);
 
-function mainController($scope, $http) {
+function mainController($scope, $http, $window) {
   $scope.formData = {};
   $scope.todos = [];
   $scope.cos = "Kalvin";
@@ -28,17 +28,39 @@ function mainController($scope, $http) {
       });
   };
 
-  $scope.updateTodo = function (id) {
-    // Recherche de la tâche correspondante dans le tableau de tâches $scope.todos
-    var todo = $scope.todos.find(function (todo) {
-      return todo.id === id;
-    });
-
-    // Si la tâche existe, marquer comme "terminée"
-    if (todo) {
-      todo.done = true;
-    }
+  //When task are done
+  $scope.markTodoDone = function(todo) {
+      todo.done = !todo.done;;
+      $http.put('/api/todos/' + todo._id, todo)
+          .success(function(data) {
+              console.log(data);
+          })
+          .error(function(data) {
+              console.log('Error: ' + data);
+          });
   };
+
+  //to change the name
+
+  $scope.openEditModal = function(todo) {
+    $scope.editedTodo = angular.copy(todo);
+    $('#editModal').modal('show'); // Open Modal Edition
+  };
+  
+  $scope.editTodo = function() {
+    $http.put('/api/todos/' + $scope.editedTodo._id, $scope.editedTodo) //Get ID of task to edit text
+      .success(function(data) {
+        console.log(data);
+        $('#editModal').modal('hide'); // Close Modal
+        $window.location.reload(); //Reload Page
+      })
+      .error(function(data) {
+        console.log('Error: ' + data);
+      });
+  };
+
+
+  
 
 
   // delete a todo after checking it
